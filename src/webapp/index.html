@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>WebSocket</title>
+
+    <script language="javascript" type="text/javascript">
+
+        var contextPath = "/websocket-1.0"
+        var wsUrl = getRootUri() + contextPath + "/websocket";
+
+        var websocket = null;
+
+        function getRootUri() {
+            return "ws://" + (document.location.hostname == "" ? "localhost" : document.location.hostname) + ":" +
+                    (document.location.port == "" ? "8080" : document.location.port);
+        }
+
+        function init() {
+            output = document.getElementById("output");
+            initWebSocket();
+        }
+
+        function initWebSocket() {
+            websocket = new WebSocket(wsUrl);
+            websocket.onopen = function (evt) {
+                onOpen(evt);
+            };
+            websocket.onmessage = function (evt) {
+                onMessage(evt);
+            };
+            websocket.onerror = function (evt) {
+                onError(evt);
+                websocket = null;
+            };
+            websocket.onclose = function (evt) {
+                onClose(evt);
+                websocket = null;
+            };
+        }
+
+        function onOpen(evt) {
+            writeToScreen("Connecting to server successful !");
+        }
+
+        function onMessage(evt) {
+            writeToScreen("Status code  " + evt.data + " was changed !");
+        }
+
+        function onError(evt) {
+            writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
+        }
+
+        function onClose(evt) {
+            writeToScreen("Connection to Server closed !");
+        }
+
+        function doSend() {
+            item = textID.value;
+            if (item == "") {
+                alert("Please enter the status code !");
+                return;
+            }
+            websocket.send(item);
+            writeToScreen("Status code " + item + " was saved.");
+        }
+
+        function writeToScreen(object) {
+            var pre = document.createElement("p");
+            pre.style.wordWrap = "break-word";
+            pre.innerHTML = object;
+            output.appendChild(pre);
+        }
+        window.addEventListener("load", init, false);
+    </script>
+
+</head>
+
+<body>
+
+    <h2>Websocket</h2>
+
+    <br><br>
+    <div>
+        <form action="">
+            Status code: <input id="textID" name="state" value="" type="text">
+            <br><br>
+            <input onclick="doSend()" value="save" type="button">
+        </form>
+    </div>
+
+    <br>
+    <br>
+
+    <div id="output" style="border: 1px #ff0000 solid; min-height: 50px; padding:10px; margin: 10px;"></div>
+
+</body>
+
+</html>
+
